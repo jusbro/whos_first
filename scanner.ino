@@ -44,8 +44,7 @@ void loop(){
 
     Serial.println("Sending remote ID to server");
     // Send a message to nrf24_server
-    uint8_t data[1]; 
-    data[0]= "1";
+    uint8_t data[] = "1";
     nrf24.send(data, sizeof(data));
     nrf24.waitPacketSent();
   }
