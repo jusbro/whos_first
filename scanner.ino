@@ -1,24 +1,31 @@
-// nrf24_client
-//REMOTE #1
+/*
+This program runs on the six remotes.
+The remotes are designed with a button. When that button is pressed, the remote's number is broadcast for the main server to pick up
+*/
+
+//The following line of code needs to be adjust for each remote that is programmed because each remote needs a unique number (1 to 6)
+
+#define remote_ID 1
+
 #include <SPI.h>
+
+//This library is part of "RadioHead" by Mike McCauley
 #include <RH_NRF24.h>
 
-// Singleton instance of the radio driver
+// Create the radio object
 RH_NRF24 nrf24;
-// RH_NRF24 nrf24(8, 7); // use this to be electrically compatible with Mirf
-// RH_NRF24 nrf24(8, 10);// For Leonardo, need explicit SS pin
-// RH_NRF24 nrf24(8, 7); // For RFM73 on Anarduino Mini
 
+//attach the remote's button to pin 2
 const int buttonPin = 2;
 
+//set the button to a default state of 0
 int buttonState = 0;
 
-void setup() 
-{
+void setup() {
   pinMode(buttonPin, INPUT);
   Serial.begin(9600);
-  while (!Serial) 
-    ; // wait for serial port to connect. Needed for Leonardo only
+
+  //The following conditions were found through tutorials. I have not yet played with options within them
   if (!nrf24.init())
     Serial.println("init failed");
   // Defaults after init are 2.402 GHz (channel 2), 2Mbps, 0dBm
@@ -29,37 +36,19 @@ void setup()
 }
 
 
-void loop()
-{
+void loop(){
+  //read the state of the button
   buttonState = digitalRead(buttonPin);
+  //if the button is pressed, process and send the remote's ID
   if (buttonState == HIGH){
 
-    Serial.println("Sending to nrf24_server");
+    Serial.println("Sending remote ID to server");
     // Send a message to nrf24_server
-    uint8_t data[] = "1";
+    uint8_t data[1]; 
+    data[0]= "1";
     nrf24.send(data, sizeof(data));
+    nrf24.waitPacketSent();
   }
   nrf24.waitPacketSent();
-  // Now wait for a reply
-  uint8_t buf[RH_NRF24_MAX_MESSAGE_LEN];
-  uint8_t len = sizeof(buf);
-  
-  if (nrf24.waitAvailableTimeout(500))
-  { 
-    // Should be a reply message for us now   
-    if (nrf24.recv(buf, &len))
-    {
-      Serial.print("got reply: ");
-      Serial.println((char*)buf);
-    }
-    else
-    {
-      Serial.println("recv failed");
-    }
-  }
-  else
-  {
-    Serial.println("No reply, is nrf24_server running?");
-  }
-  delay(400);
+  delay(10);
 }
