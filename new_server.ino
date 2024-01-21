@@ -4,6 +4,14 @@ SERVER-SIDE WIRELESS RECEIVER
 This code runs in the "whose first" tower. It will eventually be merged with the code controlling the lights on the device
 It runs a loop and "listens" for data from any of the six external remotes. Remotes should broadcast a unique character to identify them
 In the future, the remotes may also broadcast an "opposite" character indicating the remote has been turned off. This will allow the remotes to "reset" the whose first tower
+
+TO DO LIST:
+1) Add LED verifing correct reception of a remote ID
+2) Add code to accept all six remotes
+3) Determine a method of resetting tower
+4) Merge code with code controlling LEDs in whose first tower
+5) Develop and build PCB for whose first tower
+6) Verify accuracy of reception
 */
 
 
