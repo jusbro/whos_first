@@ -30,15 +30,27 @@ RF24 radio(CE_PIN, CSN_PIN);
 //May also create an "anti-character" ID in the future that sends an "off" command to the whose first tower
 char payload[] = "A";
 
+//Add the pushbutton on pin 2
+const int buttonPin = 2;
+
+//Give the button a state that can be watched, set it to off
+int buttonState = 0;
+
 
 void setup() {
   //Start Serial for debug purposes. This can be removed in final product
   Serial.begin(9600);
+
+  //Connect the button and specify it as an output
+  pinMode(buttonPin, INPUT);
+
   //Test to see if the radio device is connected properly and has started
-  if (!radio.begin()) {
-    Serial.println(F("radio hardware is not responding!!"));
-    while (1) {}  // If not, hold in infinite loop
-  }
+  delay(1000);
+  Serial.println("Startup");
+    if (!radio.begin()) {
+      Serial.println(F("radio hardware is not responding!!"));
+      while (1) {}  // If not, hold in infinite loop
+    }
   //Assign an address to the receiver. MUST MATCH THE TOWER(receiver)
   radio.openWritingPipe(0xDEADBEEF);  
 
@@ -54,14 +66,17 @@ void setup() {
 }
 
 void loop() {
-  //Send the payload, and verify that it was sent
-  if (radio.writeFast(&payload, sizeof(payload))) {
-    Serial.print(payload);
-    Serial.println(" Payload Successfully Sent");
-} else { //If transmission was not successful..
-    Serial.println("Payload Send failed");
-}
+  buttonState = digitalRead(buttonPin);
+  if (buttonState == HIGH){
+    //Send the payload, and verify that it was sent
+    if (radio.writeFast(&payload, sizeof(payload))) {
+      Serial.print(payload);
+      Serial.println(" Payload Successfully Sent");
+  } else { //If transmission was not successful..
+      Serial.println("Payload Send failed");
+  }
 
-  //temporary delay for debug purposes
-  delay(1000);
+    //temporary delay for debug purposes
+    delay(100);
+  }
 }
