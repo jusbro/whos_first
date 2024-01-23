@@ -6,7 +6,7 @@ It runs a loop and "listens" for data from any of the six external remotes. Remo
 In the future, the remotes may also broadcast an "opposite" character indicating the remote has been turned off. This will allow the remotes to "reset" the whose first tower
 
 TO DO LIST:
-1) Add LED verifing correct reception of a remote ID
+DONE 1) Add LED verifing correct reception of a remote ID
 2) Add code to accept all six remotes
 3) Determine a method of resetting tower
 4) Merge code with code controlling LEDs in whose first tower
@@ -29,9 +29,17 @@ RF24 radio(CE_PIN, CSN_PIN);
 //Create the payload and set it to a size
 char receivedPayload[32];  
 
+//Create two LEDs used to debug
+const int ledPin = 4;
+const int readyLEDPin = 13;
+
 void setup() {
   //Start Serial for debug purposes. This can be removed in final product
   Serial.begin(9600);
+
+  //Assign the LEDs as an output
+  pinMode(ledPin, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   //Test to see if the radio device is connected properly and has started
   if (!radio.begin()) {
@@ -47,6 +55,9 @@ void setup() {
 
   //Declare end of startup over Serial
   Serial.println(F("Radio Receiver Started"));
+  delay(100);
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(100);
 }
 
 void loop() {
@@ -54,9 +65,15 @@ void loop() {
   if (radio.available()) {
     radio.read(&receivedPayload, sizeof(receivedPayload));
     Serial.print(F("Received Payload: "));
+    String remote = String(receivedPayload);
     Serial.println(receivedPayload);
-  }
+    if(remote == "A"){
+      Serial.println("Turning on 'A' LED");
+      digitalWrite(ledPin, HIGH);
+    } 
 
+  }
+  
   //Temporary delay to debug more easily. Will be minimized in final code 
   delay(1000);  
 }
