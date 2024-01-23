@@ -5,13 +5,13 @@ This code runs on all of the six wireless remotes. The remotes transmit data to 
 The whose first tower registers remotes that send their identifier and list them in order of acceptance
 
 TO DO LIST:
-1) Add button that will be pressed to send the payload
-  a) Ensure only one transmission of payload per button push
-2) Determine what the final payload will be for each remote
-3) Test on external power
-4) Test without serial connection
+1)DONE Add button that will be pressed to send the payload
+  a)IN PROGRESS Ensure only one transmission of payload per button push
+2)IN PROGRESS Determine what the final payload will be for each remote
+3)DONE Test on external power
+4)DONE Test without serial connection
 5) Test on Nano Every board (final deployment hardware)
-6) Design and build PCB
+6)IN PROGRESS Design and build PCB
 7) Determine if anti-ID is needed in final design of whose first 
 */
 #include <SPI.h>
