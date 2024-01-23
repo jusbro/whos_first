@@ -1,6 +1,6 @@
-# Whose First - High School Jeopardy Machine
+# Who's First - High School Jeopardy Machine
 
-Welcome to the "Whose First" project – a high school Jeopardy machine designed for interactive classroom activities. This project aims to enhance engagement and learning in a classroom setting, allowing students to participate in a Jeopardy-style game to test their knowledge.
+Welcome to the "Who's First" project – a high school Jeopardy machine designed for interactive classroom activities. This project aims to enhance engagement and learning in a classroom setting, allowing students to participate in a Jeopardy-style game to test their knowledge.
 
 ## Overview
 
