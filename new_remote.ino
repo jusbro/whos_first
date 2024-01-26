@@ -15,6 +15,7 @@ Bounce debouncer = Bounce();
 // This is temporarily A, B, C, etc. but may be changed to any character in the future
 // May also create an "anti-character" ID in the future that sends an "off" command to the whose first tower
 char payload[] = "A";
+char neg_payload[] = "B";
 
 int buttonPin = 2;
 int buttonState = 0;
@@ -71,6 +72,13 @@ void loop() {
     }
   } else {
     messageState = 1;
+    Serial.print("Button Depressed");
+      if (radio.writeFast(&neg_payload, sizeof(neg_payload))) {
+        Serial.print(neg_payload);
+        Serial.println(" Payload Successfully Sent");
+      } else { // If transmission was not successful..
+        Serial.println("Payload Send failed");
+      }
   }
 
   // Temporary delay for debug purposes
