@@ -1,82 +1,78 @@
-/*
-REMOTE-SIDE WIRELESS TRANSMITTER
-
-This code runs on all of the six wireless remotes. The remotes transmit data to a "whose first" tower. Each remote is given a unique identifier.
-The whose first tower registers remotes that send their identifier and list them in order of acceptance
-
-TO DO LIST:
-1)DONE Add button that will be pressed to send the payload
-  a)IN PROGRESS Ensure only one transmission of payload per button push
-2)IN PROGRESS Determine what the final payload will be for each remote
-3)DONE Test on external power
-4)DONE Test without serial connection
-5) Test on Nano Every board (final deployment hardware)
-6)IN PROGRESS Design and build PCB
-7) Determine if anti-ID is needed in final design of whose first 
-*/
 #include <SPI.h>
 #include "RF24.h"
+#include <Bounce2.h>
 
-//Arduino Uno CE 8, CSN 10
-//Arduino Nano CE 7, CSN 8
+// Arduino Uno CE 8, CSN 10
+// Arduino Nano CE 7, CSN 8
 #define CE_PIN 7
 #define CSN_PIN 8
 
-// instantiate an object for the nRF24L01 transceiver
+// Instantiate an object for the nRF24L01 transceiver
 RF24 radio(CE_PIN, CSN_PIN);
+Bounce debouncer = Bounce();
 
-//Create this remote's unique ID.
-//This is temporarily A, B, C, etc. but may be changed to any character in the future
-//May also create an "anti-character" ID in the future that sends an "off" command to the whose first tower
+// Create this remote's unique ID.
+// This is temporarily A, B, C, etc. but may be changed to any character in the future
+// May also create an "anti-character" ID in the future that sends an "off" command to the whose first tower
 char payload[] = "A";
 
-//Add the pushbutton on pin 2
-const int buttonPin = 2;
-
-//Give the button a state that can be watched, set it to off
+int buttonPin = 2;
 int buttonState = 0;
 
+// A variable used to only send the transmission once per button press
+// Goes 1 when message sent, goes 0 when the button is low
+int messageState = 0;
 
 void setup() {
-  //Start Serial for debug purposes. This can be removed in final product
+  // Start Serial for debug purposes. This can be removed in the final product
   Serial.begin(9600);
+  
+  // Set up the debouncer with a debounce time of 50ms
+  debouncer.attach(buttonPin, INPUT_PULLUP);
+  debouncer.interval(50);
 
-  //Connect the button and specify it as an output
-  pinMode(buttonPin, INPUT);
+  // Test to see if the radio device is connected properly and has started
+  if (!radio.begin()) {
+    Serial.println(F("Radio hardware is not responding!!"));
+    while (1) {}  // If not, hold in an infinite loop
+  }
 
-  //Test to see if the radio device is connected properly and has started
-  delay(1000);
-  Serial.println("Startup");
-    if (!radio.begin()) {
-      Serial.println(F("radio hardware is not responding!!"));
-      while (1) {}  // If not, hold in infinite loop
-    }
-  //Assign an address to the receiver. MUST MATCH THE TOWER(receiver)
-  radio.openWritingPipe(0xDEADBEEF);  
+  // Assign an address to the receiver. MUST MATCH THE TOWER(receiver)
+  radio.openWritingPipe(0xDEADBEEF);
 
-  //Make sure this device is not listening for broacastes
+  // Make sure this device is not listening for broadcasts
   radio.stopListening();
 
-  //Set the power of the transmitter
-  //Settings too high will not work in close prox. to the receiver
+  // Set the power of the transmitter
+  // Settings too high will not work in close proximity to the receiver
   radio.setPALevel(RF24_PA_LOW);
 
-  //Declare end of startup over serial
+  // Declare the end of startup over serial
   Serial.println("Radio Started");
 }
 
 void loop() {
-  buttonState = digitalRead(buttonPin);
-  if (buttonState == HIGH){
-    //Send the payload, and verify that it was sent
-    if (radio.writeFast(&payload, sizeof(payload))) {
-      Serial.print(payload);
-      Serial.println(" Payload Successfully Sent");
-  } else { //If transmission was not successful..
-      Serial.println("Payload Send failed");
+  // Update the debouncer
+  debouncer.update();
+
+  // Get the updated button state
+  int buttonState = debouncer.read();
+
+  if (buttonState == LOW) {
+    if (messageState == 1) {
+      Serial.print("Button Pressed");
+      if (radio.writeFast(&payload, sizeof(payload))) {
+        Serial.print(payload);
+        Serial.println(" Payload Successfully Sent");
+      } else { // If transmission was not successful..
+        Serial.println("Payload Send failed");
+      }
+      messageState = 0;
+    }
+  } else {
+    messageState = 1;
   }
 
-    //temporary delay for debug purposes
-    delay(100);
-  }
+  // Temporary delay for debug purposes
+  delay(100);
 }
