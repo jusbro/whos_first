@@ -30,7 +30,7 @@ char receivedPayload[32];
 
 //Light Declarations
 //Six 9Volt lights are to be connected
-//Arduino Pins 7, 8, 9, 10, 11, and 12
+//Arduino Pins 3 to 7
 const int numLights = 6;
 //int lights[] = {7,8,9,10,11,12};
 int lights[] = {2,3,4,5,6,7};
@@ -85,14 +85,22 @@ void setup() {
     Serial.println("Radio Started");
   }
 
-  for (int i = 0; i < numLights; i++) {
-      pinMode(lights[i], OUTPUT); // Set each pin in the lights[] array as an output
-    }
-  radio.openReadingPipe(1, 0xDEADBEEF);  
-  radio.setPALevel(RF24_PA_MAX);
+  //for (int i = 0; i < numLights; i++) {
+  //   pinMode(lights[i], OUTPUT); // Set each pin in the lights[] array as an output
+  //  }
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+  Serial.println("Lights Created");
+
+  radio.openReadingPipe(1, 0x12341234);  
+  radio.setPALevel(RF24_PA_LOW);
   //Start listening for transmissions
   radio.startListening();
-  radio.printDetails();
+
 
   //Declare end of startup over Serial
   Serial.println(F("All Radio Calls Complete"));
@@ -102,6 +110,7 @@ void setup() {
   //lightTest();
   //winTone();
   delay(10);
+  lightTest();
   Serial.println("Setup Complete");
   delay(100);
 
@@ -117,10 +126,13 @@ void loop() {
     Serial.println(receivedPayload);
     if(remote == "A"){
       Serial.println("Turning on 'A' LED");
-      digitalWrite(3, HIGH);
+      digitalWrite(6, HIGH);
+      Serial.println("Light is On");
+      delay(10);
     } else if(remote == "B")
       Serial.println("Turning off 'A' LED");
-      digitalWrite(3, LOW);
+      digitalWrite(6, LOW);
+      delay(10);
   }
   
   //Temporary delay to debug more easily. Will be minimized in final code 
