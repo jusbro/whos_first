@@ -125,16 +125,27 @@ void loop() {
     String remote = String(receivedPayload);
     Serial.println(receivedPayload);
     if(remote == "A"){
-      Serial.println("Turning on 'A' LED");
-      digitalWrite(6, HIGH);
-      Serial.println("Light is On");
+      digitalWrite(2, HIGH);
       delay(10);
-    } else if(remote == "B")
-      Serial.println("Turning off 'A' LED");
-      digitalWrite(6, LOW);
+      Serial.println("Turning on '2' LED");
       delay(10);
+    }else if(remote == "B"){
+      digitalWrite(2, LOW);
+      delay(10);
+      Serial.println("Turning off '2' LED");
+    } else if(remote == "C"){
+      digitalWrite(3, HIGH);
+      delay(10);
+      Serial.println("Turning off '3' LED");
+    } else if(remote == "D"){
+      digitalWrite(3, LOW);
+      delay(10);
+      Serial.println("Turning off '3' LED");
+    }
   }
-  
+  //digitalWrite(6, HIGH);
   //Temporary delay to debug more easily. Will be minimized in final code 
-  delay(100);  
+  delay(10);
+  //digitalWrite(6, LOW);  
+  //delay(100);
 }
