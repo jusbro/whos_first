@@ -4,8 +4,8 @@
 
 // Arduino Uno CE 8, CSN 10
 // Arduino Nano CE 7, CSN 8
-#define CE_PIN 8
-#define CSN_PIN 10
+#define CE_PIN 7
+#define CSN_PIN 8
 
 // Instantiate an object for the nRF24L01 transceiver
 RF24 radio(CE_PIN, CSN_PIN);
@@ -14,8 +14,8 @@ RF24 radio(CE_PIN, CSN_PIN);
 // Create this remote's unique ID.
 // This is temporarily A, B, C, etc. but may be changed to any character in the future
 // May also create a "neg_payload" ID in the future that sends an "off" command to the whose first tower
-char payload[] = "C";
-char neg_payload[] = "D";
+char payload[] = "A";
+char neg_payload[] = "A";
 
 int buttonPin = 2;
 int buttonState = 0;
@@ -48,7 +48,7 @@ void setup() {
 
   // Set the power of the transmitter
   // Settings too high will not work in close proximity to the receiver
-  radio.setPALevel(RF24_PA_LOW);
+  radio.setPALevel(RF24_PA_MAX);
 
   // Declare the end of startup over serial
   Serial.println("Radio Started");
