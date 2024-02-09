@@ -12,6 +12,7 @@ This program controls six 9 volt lights (denoted by L#(0-5) EX: L1) via NPN tran
 #include <SPI.h>
 #include <RF24.h>
 
+
 //Pins used for the RF Module vary based on board used
 //Arduino Uno CE 8, CSN 10
 //Arduino Nano CE 7, CSN 8
@@ -23,6 +24,10 @@ RF24 radio(CE_PIN, CSN_PIN);
 
 //Create the payload vessel
 char receivedPayload[32];  
+
+//Create Strings to store first and second place remotes
+String firstRemote = "";
+String secondRemote = "";
 
 //Light Declarations
   //Six 9Volt lights are to be connected
@@ -38,6 +43,42 @@ int tonePin = A5;
 int testLightDelay = 100;
 int testLightDelayShort = 10;
 
+void firstLight(String remote){
+  //This function runs after the first remote sends its payload
+  //It turns on the light that matches that remote and keeps it on solid
+  //If a second remote sends its payload, secondLight() is called
+  if (remote == "A"){
+    digitalWrite(2, HIGH);
+  } else if (remote == "C"){
+    digitalWrite(3, HIGH);
+  }
+  winTone();
+}
+void secondLight(String firstRemote, String secondRemote){
+  //This function is called when a second remote sends its payload
+  //It indicates which remote was first by changing that light to a flashing pattern.
+  //The second remote's light will turn on solid
+  if (secondRemote == "A"){
+    digitalWrite(2, HIGH);
+  } else if (secondRemote == "C"){
+    digitalWrite(3, HIGH);
+  }
+  if (firstRemote == "A"){
+    while (1){
+      digitalWrite(2, HIGH);
+      delay(500);
+      digitalWrite(2,LOW);
+      delay(500);
+    }
+  } else if(firstRemote == "C"){
+    while (1){
+      digitalWrite(3, HIGH);
+      delay(500);
+      digitalWrite(3,LOW);
+      delay(500);
+    }
+  }
+}
 
 void winTone(){
   //This function plays a tone over the tone pin when called
@@ -88,14 +129,18 @@ void radioErrorFlashLEDs(){
 
 void setup() {
   //Check to see if radio can start
+  Serial.begin(9600);
   if (!radio.begin()) {
     radioErrorFlashLEDs();
     while (1) {}  
   }
+
+
   //Setup all light pins as outputs
   for (int i = 0; i < numLights; i++) {
     pinMode(lights[i], OUTPUT); // Set each pin in the lights[] array as an output
   }
+
   //Assign an address, must match remotes
   radio.openReadingPipe(1, 0x12341234);
   //Set radio power level. MAX may not work when radios are close together  
@@ -109,7 +154,8 @@ void setup() {
   //Test Lights
   lightTest();
   //Test Tone Pin
-  winTone();
+  //winTone();
+  Serial.println("Ready");
   delay(100);
 
 }
@@ -120,29 +166,22 @@ void loop() {
     //Set the received data into the payload
     radio.read(&receivedPayload, sizeof(receivedPayload));
     String remote = String(receivedPayload);
-    //Start 
-    if(remote == "A"){
-      digitalWrite(2, HIGH);
-      //winTone();
-      delay(10);
-
-      delay(10);
-    }else if(remote == "B"){
-      digitalWrite(2, LOW);
-      delay(10);
-
-    } else if(remote == "C"){
-      digitalWrite(3, HIGH);
-      delay(10);
-
-    } else if(remote == "D"){
-      digitalWrite(3, LOW);
-      delay(10);
-
+    Serial.println("Got Data: " + remote);
+    //Determine if this is the first remote to respond
+    if (firstRemote ==""){
+      //if so, store this remote's payload as the firstRemote
+      firstRemote = remote;
+      Serial.println("First Place:"+ firstRemote);
+      firstLight(remote);
+    }else if (secondRemote == ""){
+      secondRemote = remote;
+      Serial.println("Second Place:"+ secondRemote);
+      secondLight(firstRemote, secondRemote);
     }
-  }
 
-  //Temporary delay to debug more easily. Will be minimized in final code 
-  delay(10);
+
+    //Temporary delay to debug more easily. Will be minimized in final code 
+    delay(10);
+  }
 
 }
