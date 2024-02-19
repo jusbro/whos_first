@@ -1,11 +1,8 @@
-/*
-Whose First Arduino Retrofit
-Creators: Justin Brown and Greg King
-Origin Date: 1/8/2024
+/*Arduino Uno REV3 Server (tower) Control for Who's First Device
+This software is designed to run on a Uno REV 3. Its purpose is to act as a server that receives transmissions from up to six student remotes
 
-The goal of this program is to retrofit an Arduino into a "Who's First device to allow future support"
-
-This program controls six 9 volt lights (denoted by L#(0-5) EX: L1) via NPN transistors
+Version 0.91
+Last updated 2/19/2024
 */
 
 //IMPORTS
@@ -39,7 +36,7 @@ int lights[] = {2,3,4,5,6,7};
 //Pin that the speaker in the tower is connected to
 int tonePin = A5;
 
-//Delays used in programming
+//Delays used in program
 int testLightDelay = 100;
 int testLightDelayShort = 10;
 
@@ -57,7 +54,7 @@ void firstLight(String remote){
 void secondLight(String firstRemote, String secondRemote){
   //This function is called when a second remote sends its payload
   //It indicates which remote was first by changing that light to a flashing pattern.
-  //The second remote's light will turn on solid
+  //The second remote's light will turn on as solid
   if (secondRemote == "A"){
     digitalWrite(2, HIGH);
   } else if (secondRemote == "C"){
@@ -115,7 +112,9 @@ void lightTest(){
 void radioErrorFlashLEDs(){
 //This fuction is called when there is an error starting up the radio module
 //Due to the final product not having serial connection, LEDs will be used for error detection
+
   for (int i = 0; i<10; i++){
+    //Flash the LEDs 10 times
     for (int i = 0; i<numLights; i++){
       digitalWrite(lights[i], HIGH);
     }
@@ -130,7 +129,9 @@ void radioErrorFlashLEDs(){
 void setup() {
   //Check to see if radio can start
   Serial.begin(9600);
+  
   if (!radio.begin()) {
+    //If the radio cannot connect, go to the error notification function
     radioErrorFlashLEDs();
     while (1) {}  
   }
@@ -153,8 +154,7 @@ void setup() {
   pinMode(tonePin, OUTPUT);
   //Test Lights
   lightTest();
-  //Test Tone Pin
-  //winTone();
+
   Serial.println("Ready");
   delay(100);
 
@@ -165,6 +165,7 @@ void loop() {
   if (radio.available()) {
     //Set the received data into the payload
     radio.read(&receivedPayload, sizeof(receivedPayload));
+    //Convert it to a string
     String remote = String(receivedPayload);
     Serial.println("Got Data: " + remote);
     //Determine if this is the first remote to respond
