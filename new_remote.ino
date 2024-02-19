@@ -1,7 +1,17 @@
+/*Arduino Nano Every Remote Control for Who's First Device
+This software is designed to run on a Nano Every. Its purpose is to act as a remote (one of up to six) that students use to buzz in on a Who's First device
+This software can be used and has been tested on Arduino Nano Every and Arduino Uno REV3
+
+Version 0.91
+Last updated 2/19/2024
+*/
+
+//IMPORTS
 #include <SPI.h>
 #include "RF24.h"
 #include <Bounce2.h>
 
+//Declare the Chip Enable (CE) and Chip Select (CSN) pins
 // Arduino Uno CE 8, CSN 10
 // Arduino Nano CE 7, CSN 8
 #define CE_PIN 7
@@ -9,14 +19,26 @@
 
 // Instantiate an object for the nRF24L01 transceiver
 RF24 radio(CE_PIN, CSN_PIN);
-//Bounce debouncer = Bounce();
 
-// Create this remote's unique ID.
-// This is temporarily A, B, C, etc. but may be changed to any character in the future
-// May also create a "neg_payload" ID in the future that sends an "off" command to the whose first tower
+/*Create this remote's unique ID.
+This is temporarily A, B, C, etc. but may be changed to any character in the future
+May also create a "neg_payload" ID in the future that sends an "off" command to the whose first tower
+The following convention will be used:
+Pink = A / G
+Green = B / H
+Yellow = C / I
+Orange = D / J
+Blue = E / K
+Red = F / L
+*/
+
+//This remote's unique ID as defined above
 char payload[] = "A";
-char neg_payload[] = "A";
 
+//This remote's unique neg_payload (If Using One)
+//char neg_payload[] = "";
+
+//Create a button and a button tracking state
 int buttonPin = 2;
 int buttonState = 0;
 
@@ -30,10 +52,6 @@ void setup() {
   // Start Serial for debug purposes. This can be removed in the final product
   Serial.begin(9600);
   
-  // Set up the debouncer with a debounce time of 50ms
-  //debouncer.attach(buttonPin, INPUT_PULLUP);
-  //debouncer.interval(50);
-
   // Test to see if the radio device is connected properly and has started
   if (!radio.begin()) {
     Serial.println(F("Radio hardware is not responding!!"));
@@ -55,19 +73,18 @@ void setup() {
 }
 
 void loop() {
-  // Update the debouncer
-  //debouncer.update();
 
   // Get the updated button state
   int buttonState = digitalRead(buttonPin);
 
+  // If the button were pressed, send the payload ID
   if (buttonState == LOW && prevButtonState == HIGH) {
     if (messageState == 1) {
       Serial.print("Button Pressed ");
       if (radio.write(&payload, sizeof(payload))) {
         Serial.print(payload);
         Serial.println(" Successfully Sent");
-        delay(200);  // Add a longer delay after a successful transmission
+        delay(200);  // Add a delay after a successful transmission
       } else { // If transmission was not successful..
         Serial.println("Payload Send failed");
       }
@@ -77,9 +94,9 @@ void loop() {
     messageState = 1;
     Serial.print("Button Depressed ");
     if (radio.write(&neg_payload, sizeof(neg_payload))) {
-      Serial.print(neg_payload);
+      Serial.print(payload);
       Serial.println(" Successfully Sent");
-      delay(200);  // Add a longer delay after a successful transmission
+      delay(200);  // Add a delay after a successful transmission
     } else { // If transmission was not successful..
       Serial.println("Payload Send failed");
     }
