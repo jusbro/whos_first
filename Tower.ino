@@ -46,8 +46,16 @@ void firstLight(String remote){
   //If a second remote sends its payload, secondLight() is called
   if (remote == "A"){
     digitalWrite(2, HIGH);
-  } else if (remote == "C"){
+  } else if (remote == "B"){
     digitalWrite(3, HIGH);
+  } else if (remote == "C"){
+    digitalWrite(4, HIGH);
+  }else if (remote == "D"){
+    digitalWrite(5, HIGH);
+  }else if (remote == "E"){
+    digitalWrite(6, HIGH);
+  }else if (remote == "F"){
+    digitalWrite(7, HIGH);
   }
   winTone();
 }
