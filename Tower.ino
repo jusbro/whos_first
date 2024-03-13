@@ -28,7 +28,7 @@ String secondRemote = "";
 
 //Light Declarations
   //Six 9Volt lights are to be connected
-  //Arduino Pins 3 to 7
+  //Arduino Pins 2 to 7
 const int numLights = 6;
 //Create an array of light pins for easy access
 int lights[] = {2,3,4,5,6,7};
@@ -57,8 +57,16 @@ void secondLight(String firstRemote, String secondRemote){
   //The second remote's light will turn on as solid
   if (secondRemote == "A"){
     digitalWrite(2, HIGH);
-  } else if (secondRemote == "C"){
+  }else if (secondRemote == "B"){
     digitalWrite(3, HIGH);
+  } else if (secondRemote == "C"){
+    digitalWrite(4, HIGH);
+  } else if (secondRemote == "D"){
+    digitalWrite(5, HIGH);
+  }else if (secondRemote == "E"){
+    digitalWrite(6, HIGH);
+  }else if (secondRemote == "F"){
+    digitalWrite(7, HIGH);
   }
   if (firstRemote == "A"){
     while (1){
@@ -67,11 +75,39 @@ void secondLight(String firstRemote, String secondRemote){
       digitalWrite(2,LOW);
       delay(500);
     }
-  } else if(firstRemote == "C"){
+  } else if(firstRemote == "B"){
     while (1){
       digitalWrite(3, HIGH);
       delay(500);
       digitalWrite(3,LOW);
+      delay(500);
+    }
+  }else if(firstRemote == "C"){
+    while (1){
+      digitalWrite(4, HIGH);
+      delay(500);
+      digitalWrite(4,LOW);
+      delay(500);
+    }
+  }else if(firstRemote == "D"){
+    while (1){
+      digitalWrite(5, HIGH);
+      delay(500);
+      digitalWrite(5, LOW);
+      delay(500);
+    }
+  }else if(firstRemote == "E"){
+    while (1){
+      digitalWrite(6, HIGH);
+      delay(500);
+      digitalWrite(6, LOW);
+      delay(500);
+    }
+  }else if(firstRemote == "F"){
+    while (1){
+      digitalWrite(7, HIGH);
+      delay(500);
+      digitalWrite(7,LOW);
       delay(500);
     }
   }
