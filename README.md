@@ -1,6 +1,6 @@
 # Who's First - High School Jeopardy Machine
 
-Welcome to the "Who's First" project – an Arduinno retrofit of a high school Jeopardy machine designed for interactive classroom activities. The Arduinos are used to replace broken hardware in the provided Who's First Device. This project aims to enhance engagement and learning in a classroom setting, allowing students to participate in a Jeopardy-style game to test their knowledge.
+Welcome to the "Who's First" project – an Arduino retrofit of a high school Jeopardy machine designed for interactive classroom activities. The Arduinos are used to replace broken hardware in the provided Who's First Device. This project aims to enhance engagement and learning in a classroom setting, allowing students to participate in a Jeopardy-style game to test their knowledge.
 
 ## Overview
 
